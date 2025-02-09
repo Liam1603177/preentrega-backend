@@ -6,29 +6,45 @@ const cartManager = new CartManager();
 
 // Crear un nuevo carrito
 router.post('/', async (req, res) => {
-    const newCart = await cartManager.addCart();
-    res.status(201).json(newCart);
+    try {
+        const newCart = await cartManager.addCart();
+        if (!newCart) {
+            return res.status(500).json({ error: 'No se pudo crear el carrito' });
+        }
+        res.status(201).json(newCart);
+    } catch (error) {
+        console.error('Error al crear carrito:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
 // Obtener los productos de un carrito
 router.get('/:cid', async (req, res) => {
-    const { cid } = req.params;
-    const cart = await cartManager.getCartById(cid);
-    if (cart) {
+    try {
+        const { cid } = req.params;
+        const cart = await cartManager.getCartById(cid);
+        if (!cart) {
+            return res.status(404).json({ error: 'Carrito no encontrado' });
+        }
         res.json(cart);
-    } else {
-        res.status(404).json({ error: 'Carrito no encontrado' });
+    } catch (error) {
+        console.error('Error al obtener carrito:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
 // Agregar un producto al carrito
 router.post('/:cid/product/:pid', async (req, res) => {
-    const { cid, pid } = req.params;
-    const cart = await cartManager.addProductToCart(cid, pid);
-    if (cart) {
+    try {
+        const { cid, pid } = req.params;
+        const cart = await cartManager.addProductToCart(cid, pid);
+        if (!cart) {
+            return res.status(404).json({ error: 'Carrito o producto no encontrado' });
+        }
         res.json(cart);
-    } else {
-        res.status(404).json({ error: 'Carrito o producto no encontrado' });
+    } catch (error) {
+        console.error('Error al agregar producto al carrito:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 

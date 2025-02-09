@@ -1,14 +1,14 @@
 [
   {
-    "id": 1,
-    "title": "Producto A Actualizado",
-    "description": "Descripción del producto A",
-    "code": "A123",
-    "price": 120,
-    "stock": 10,
-    "category": "Electrónica",
+    "id": 2,
+    "title": "Producto B",
+    "description": "Descripción del producto B",
+    "code": "B123",
+    "price": 150,
+    "stock": 20,
+    "category": "Hogar",
     "thumbnails": [
-      "ruta/imagen1.jpg"
+      "ruta/imagen2.jpg"
     ],
     "status": true
   }
