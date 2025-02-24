@@ -18,7 +18,7 @@ class ProductManager {
             // Leer los productos existentes
             const products = await this.getProducts();
 
-            // Crear un nuevo ID (asegurando que no se repita)
+            // Crear un nuevo ID
             const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
 
             // Crear el producto con el nuevo ID y otros campos

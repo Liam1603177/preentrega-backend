@@ -21,30 +21,19 @@ class ProductManager {
     // Agregar un nuevo producto
     async addProduct(product) {
         try {
-            // Leer los productos existentes
+            console.log("Datos recibidos:", product);
             const products = await this.getProducts();
-
-            // Crear un nuevo ID (asegurando que no se repita)
             const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-
-            // Crear el nuevo producto con el ID generado
-            const newProduct = {
-                id: newId,
-                ...product
-            };
-
-            // Agregar el nuevo producto a la lista
+            const newProduct = { id: newId, ...product };
             products.push(newProduct);
-
-            // Guardar los productos actualizados en el archivo
             await fs.writeFile(path, JSON.stringify(products, null, 2));
-            
-            return newProduct; // Devolver el producto con el ID generado
+            return newProduct;
         } catch (error) {
             console.error("Error al agregar el producto:", error);
             throw error;
         }
     }
+    
 
     // Actualizar un producto por ID
     async updateProduct(id, updatedData) {

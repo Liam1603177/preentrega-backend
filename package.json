@@ -9,7 +9,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "express-handlebars": "^8.0.1",
+    "socket.io": "^4.8.1"
   },
-  "description": ""
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Liam1603177/preentrega-backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Liam1603177/preentrega-backend/issues"
+  },
+  "homepage": "https://github.com/Liam1603177/preentrega-backend#readme"
 }

@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const ProductManager = require('../models/ProductManager'); // Importa la clase
+const ProductManager = require('../models/ProductManager');
 
-const productManager = new ProductManager(); // Ahora puedes instanciarlo correctamente
+const productManager = new ProductManager('./src/data/products.json');
+
 
 router.get('/', async (req, res) => {
     try {
@@ -22,13 +23,18 @@ router.get('/:pid', async (req, res) => {
         res.status(404).json({ error: 'Producto no encontrado' });
     }
 });
-
 router.post('/', async (req, res) => {
-    const { title, description, code, price, stock, category, thumbnails = [] } = req.body;
-    if (!title || !description || !code || !price || !stock || !category) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios, excepto thumbnails' });
+    console.log("Cuerpo de la solicitud:", req.body);
+
+    const { title, price, stock, category, description = "", code = "", thumbnails = [], status = true } = req.body;
+
+    // Solo se requieren algunos campos clave
+    if (!title || !price || !stock || !category) {
+        return res.status(400).json({ error: 'Los campos title, price, stock y category son obligatorios' });
     }
-    const newProduct = { title, description, code, price, stock, category, thumbnails, status: true };
+
+    const newProduct = { title, description, code, price, stock, category, thumbnails, status };
+
     try {
         const addedProduct = await productManager.addProduct(newProduct);
         res.status(201).json(addedProduct);
@@ -36,6 +42,7 @@ router.post('/', async (req, res) => {
         res.status(500).json({ error: 'Error al agregar el producto' });
     }
 });
+
 
 router.put('/:pid', async (req, res) => {
     const { pid } = req.params;
@@ -46,6 +53,7 @@ router.put('/:pid', async (req, res) => {
     } else {
         res.status(404).json({ error: 'Producto no encontrado' });
     }
+
 });
 
 router.delete('/:pid', async (req, res) => {
