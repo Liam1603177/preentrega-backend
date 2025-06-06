@@ -23,9 +23,3 @@ Proyecto final del curso Backend de Coderhouse. Aplicación de backend desarroll
 - handlebars
 
 ## 🔐 Variables de entorno
-
-Crear un archivo `.env` con los siguientes campos:
-
-```env
-PORT=8080
-MONGO_URL=mongodb+srv://ignaciodaddario:Liam1603177@cluster0.zggve.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
