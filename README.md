@@ -23,3 +23,8 @@ Proyecto final del curso Backend de Coderhouse. Aplicación de backend desarroll
 - handlebars
 
 ## 🔐 Variables de entorno
+
+PORT=8080
+MONGO_URI=
+JWT_SECRET=
+COOKIE_SECRET=
