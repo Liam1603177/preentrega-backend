@@ -1,51 +1,60 @@
-const fs = require('fs').promises;
-const path = './src/data/products.json';
+import ProductManager from '../dao/mongo/managers/ProductManager.js';
+const productManager = new ProductManager();
 
-class ProductManager {
-    // Obtener todos los productos
-    async getProducts() {
-        try {
-            const data = await fs.readFile(path, 'utf8');
-            return JSON.parse(data);
-        } catch (error) {
-            return [];
-        }
-    }
+export const getProducts = async (req, res) => {
+  try {
+    const { limit = 10, page = 1, sort, category, stock } = req.query;
+    const filter = {};
+    if (category) filter.category = category;
+    if (stock) filter.stock = { $gt: stock };
+    const options = {
+      limit: parseInt(limit),
+      page: parseInt(page),
+      sort: sort ? { price: sort === 'asc' ? 1 : -1 } : undefined
+    };
 
-    // Agregar un nuevo producto
-    async addProduct(product) {
-        try {
-            // Leer los productos existentes
-            const products = await this.getProducts();
+    const products = await productManager.getProducts(filter, options);
+    res.json(products);
+  } catch (error) { console.error(error)
+    res.status(500).json({ error: 'Error al obtener productos' });
+  }
+};
 
-            // Crear un nuevo ID
-            const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+export const getProductById = async (req, res) => {
+  try {
+    const product = await productManager.getProductById(req.params.pid);
+    if (!product) return res.status(404).json({ error: 'Producto no encontrado' });
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener producto' });
+  }
+};
 
-            // Crear el producto con el nuevo ID y otros campos
-            const newProduct = {
-                id: newId,
-                title: product.title,
-                description: product.description,
-                code: product.code,
-                price: product.price,
-                status: product.status !== undefined ? product.status : true,
-                stock: product.stock,
-                category: product.category,
-                thumbnails: product.thumbnails || []
-            };
+export const createProduct = async (req, res) => {
+  try {
+    const product = await productManager.createProduct(req.body);
+    res.status(201).json(product);
+  } catch (error) {
+    res.status(400).json({ error: 'Error al crear producto', details: error.message });
+  }
+};
 
-            // Agregar el producto a la lista
-            products.push(newProduct);
+export const updateProduct = async (req, res) => {
+  try {
+    const product = await productManager.updateProduct(req.params.pid, req.body);
+    if (!product) return res.status(404).json({ error: 'Producto no encontrado' });
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al actualizar producto' });
+  }
+};
 
-            // Guardar los productos actualizados en el archivo
-            await fs.writeFile(path, JSON.stringify(products, null, 2));
-            
-            return newProduct; // Devolver el producto con el ID generado
-        } catch (error) {
-            console.error("Error al agregar el producto:", error);
-            throw error;
-        }
-    }
-}
-
-module.exports = new ProductManager();
+export const deleteProduct = async (req, res) => {
+  try {
+    const deleted = await productManager.deleteProduct(req.params.pid);
+    if (!deleted) return res.status(404).json({ error: 'Producto no encontrado' });
+    res.json({ message: 'Producto eliminado' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar producto' });
+  }
+};

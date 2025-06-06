@@ -1,7 +1,7 @@
-const passport = require('passport');
-const JwtStrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt;
-const User = require('../models/User');
+import passport from 'passport';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import User from '../dao/mongo/models/User.js';
+
 const cookieExtractor = (req) => {
   let token = null;
   if (req && req.cookies) {
@@ -12,7 +12,7 @@ const cookieExtractor = (req) => {
 
 const opts = {
   jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
-  secretOrKey: 'claveSecretaJWT' // Cambiala por una más segura en producción
+  secretOrKey: 'claveSecretaJWT'
 };
 
 passport.use('current', new JwtStrategy(opts, async (jwt_payload, done) => {
@@ -25,4 +25,4 @@ passport.use('current', new JwtStrategy(opts, async (jwt_payload, done) => {
   }
 }));
 
-module.exports = passport;
+export default passport;

@@ -1,14 +1,29 @@
-const express = require('express');
-const passport = require('passport');
-const { register, login } = require('../controllers/sessions.controller');
+import { Router } from 'express';
+import passport from 'passport';
+import {
+  register,
+  login,
+  logout,
+  getCurrent
+} from '../controllers/sessions.controller.js';
+import { passportCall } from '../middlewares/passportCall.js';
+import { authorization } from '../middlewares/authorization.js';
+const router = Router();
 
-const router = express.Router();
+// Registro
+router.post('/register', passport.authenticate('register', { session: false, failureRedirect: '/failregister' }), register);
 
-router.post('/register', register);
-router.post('/login', login);
+// Login
+router.post('/login', passport.authenticate('login', { session: false, failureRedirect: '/faillogin' }), login);
 
-router.get('/current', passport.authenticate('current', { session: false }), (req, res) => {
-  res.json({ status: 'success', user: req.user });
+// Logout
+router.post('/logout', logout);
+
+// Current user con JWT
+router.get('/current', passport.authenticate('jwt', { session: false }), getCurrent);
+
+router.get('/perfil', passportCall('jwt'), authorization('user'), (req, res) => {
+  res.json({ message: 'Acceso permitido', user: req.user });
 });
 
-module.exports = router;
+export default router;

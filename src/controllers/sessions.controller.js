@@ -1,57 +1,31 @@
-const User = require('../models/User');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
+import config from '../config/config.js';
 
-const createHash = (password) => bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-const isValidPassword = (user, password) => bcrypt.compareSync(password, user.password);
-
-const register = async (req, res) => {
-  const { first_name, last_name, email, age, password } = req.body;
-
-  try {
-    const existUser = await User.findOne({ email });
-    if (existUser) return res.status(400).json({ message: 'El usuario ya existe' });
-
-    const hashedPassword = createHash(password);
-
-    const newUser = await User.create({
-      first_name,
-      last_name,
-      email,
-      age,
-      password: hashedPassword
-    });
-
-    res.status(201).json({ status: 'success', user: newUser });
-  } catch (error) {
-    res.status(500).json({ status: 'error', error });
-  }
+export const register = async (req, res) => {
+  res.send({ status: 'success', message: 'Usuario registrado correctamente' });
 };
 
-const login = async (req, res) => {
-  const { email, password } = req.body;
+export const login = async (req, res) => {
+  const user = req.user;
 
-  try {
-    const user = await User.findOne({ email });
-    if (!user || !isValidPassword(user, password)) {
-      return res.status(401).json({ message: 'Credenciales inválidas' });
-    }
+  if (!user) {
+    return res.status(401).send({ status: 'error', error: 'Credenciales inválidas' });
+  }
 
-    const token = jwt.sign({ id: user._id }, 'claveSecretaJWT', { expiresIn: '1h' });
+  const token = jwt.sign({ user }, config.jwtSecret, { expiresIn: '1h' });
 
-    res.cookie('jwtCookie', token, {
+  res
+    .cookie('coderToken', token, {
       httpOnly: true,
       secure: false,
-      maxAge: 60 * 60 * 1000
-    });
-
-    res.json({ status: 'success', token });
-  } catch (error) {
-    res.status(500).json({ status: 'error', error });
-  }
+    })
+    .send({ status: 'success', message: 'Login exitoso' });
 };
 
-module.exports = {
-  register,
-  login
+export const logout = (req, res) => {
+  res.clearCookie('coderToken').send({ status: 'success', message: 'Logout exitoso' });
+};
+
+export const getCurrent = (req, res) => {
+  res.send({ status: 'success', user: req.user });
 };
